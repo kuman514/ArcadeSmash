@@ -6,12 +6,12 @@ def normalSmash(watchLimit, watchCount, Display):
 	for i in range(0,2,1) :
 		Display.blit(animation[i], (0,0))
 		pygame.display.update()
-		time.sleep(0.15)
+		time.sleep(0.18)
 
 	if watchCount >= watchLimit :
 		pass
 	else :
-		return (10, -3, 3, 20)		# (money, anger, damage, watchCount)
+		return (10, -3, 1, 20)		# (money, anger, damage, watchCount)
 
 def strongSmash(watchLimit, watchCount, Display):
 	animation = (pygame.image.load('strongsmash1.png'), pygame.image.load('strongsmash2.png'))
@@ -23,7 +23,7 @@ def strongSmash(watchLimit, watchCount, Display):
 	if watchCount >= watchLimit :
 		pass
 	else :
-		return (30, -8, 10, 45)		# (money, anger, damage, watchCount)
+		return (30, -8, 3, 45)		# (money, anger, damage, watchCount)
 
 def compensate(money, damage):
 	pass
@@ -31,8 +31,8 @@ def compensate(money, damage):
 def Play(Display):
 	score = 0			# Total score
 	money = 0			# You can get some score on a smash
-	anger = 0			# If you don't smash your anger gets greater and greater
-	damage = 0			# Damage of the arcade machine
+	anger = 0			# If you don't smash your anger gets greater and greater (limit 100)
+	damage = 0			# Damage of the arcade machine (limit 100)
 
 	watchLimit = 90
 	watchCount = 0		# The clerk would watch
@@ -41,6 +41,7 @@ def Play(Display):
 	player = pygame.image.load('player.png')
 	clerk = (pygame.image.load('clerk.png'), pygame.image.load('clerkwatching.png'))
 
+	S = time.time()
 	while True:
 		for Event in pygame.event.get():
 			if Event.type == QUIT:
@@ -52,12 +53,19 @@ def Play(Display):
 		else :
 			status = 0
 
+		E = time.time()
+		if E - S >= 1 :
+			S = time.time()
+			score += 10
+			anger += 1
+			if watchCount > 0 :
+				watchCount -= 1
+
+
 		Display.fill(0x000000)
 		Display.blit(bg, (0,0))
 		Display.blit(player, (0,0))
 		Display.blit(clerk[status], (510,0))
-
-		#score += 1
 
 		Key = pygame.key.get_pressed()
 
@@ -65,14 +73,20 @@ def Play(Display):
 			print 'smash normal'
 			result = normalSmash(watchLimit, watchCount, Display)
 			if type(result) == tuple :
-				pass
+				money += result[0]
+				anger += result[1]
+				damage += result[2]
+				watchCount += result[3]
 			elif type(result) == bool :
 				pass
 		elif Key[pygame.constants.K_LSHIFT]:
 			print 'smash strong'
 			result = strongSmash(watchLimit, watchCount, Display)
 			if type(result) == tuple :
-				pass
+				money += result[0]
+				anger += result[1]
+				damage += result[2]
+				watchCount += result[3]
 			elif type(result) == bool :
 				pass
 		elif Key[pygame.constants.K_ESCAPE]:
