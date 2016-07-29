@@ -8,7 +8,7 @@ height = 540
 pygame.init()
 
 Display = pygame.display.set_mode((width,height))
-Title = pygame.image.load('TestTitle.png')
+Title = pygame.image.load('maintitle.png')
 
 pygame.display.set_caption('Arcade Smash')
 

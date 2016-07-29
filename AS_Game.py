@@ -1,13 +1,31 @@
 import pygame, sys, time
 from pygame.locals import *
 
-def normalSmash(watching):
-	return (10, -1, 3, 20)		# (money, anger, damage, watchCount)
+def normalSmash(watchLimit, watchCount, Display):
+	animation = (pygame.image.load('normalsmash1.png'), pygame.image.load('normalsmash2.png'))
+	for i in range(0,2,1) :
+		Display.blit(animation[i], (0,0))
+		pygame.display.update()
+		time.sleep(0.15)
 
-def strongSmash(watching):
-	return (30, -3, 10, 45)	# (money, anger, damage, watchCount)
+	if watchCount >= watchLimit :
+		pass
+	else :
+		return (10, -3, 3, 20)		# (money, anger, damage, watchCount)
 
-def compensate(money):
+def strongSmash(watchLimit, watchCount, Display):
+	animation = (pygame.image.load('strongsmash1.png'), pygame.image.load('strongsmash2.png'))
+	for i in range(0,6,1) :
+		Display.blit(animation[i % 2], (0,0))
+		pygame.display.update()
+		time.sleep(0.1)
+
+	if watchCount >= watchLimit :
+		pass
+	else :
+		return (30, -8, 10, 45)		# (money, anger, damage, watchCount)
+
+def compensate(money, damage):
 	pass
 
 def Play(Display):
@@ -18,7 +36,10 @@ def Play(Display):
 
 	watchLimit = 90
 	watchCount = 0		# The clerk would watch
-	watching = False	# If the clerk is seeing you...
+
+	bg = pygame.image.load('gamebg.png')
+	player = pygame.image.load('player.png')
+	clerk = (pygame.image.load('clerk.png'), pygame.image.load('clerkwatching.png'))
 
 	while True:
 		for Event in pygame.event.get():
@@ -26,30 +47,37 @@ def Play(Display):
 				pygame.quit()
 				sys.exit()
 
+		if watchCount >= watchLimit :
+			status = 1
+		else :
+			status = 0
+
 		Display.fill(0x000000)
-		score += 1
+		Display.blit(bg, (0,0))
+		Display.blit(player, (0,0))
+		Display.blit(clerk[status], (510,0))
+
+		#score += 1
 
 		Key = pygame.key.get_pressed()
 
 		if Key[pygame.constants.K_RETURN]:
 			print 'smash normal'
-			result = normalSmash()
+			result = normalSmash(watchLimit, watchCount, Display)
 			if type(result) == tuple :
 				pass
 			elif type(result) == bool :
 				pass
-
 		elif Key[pygame.constants.K_LSHIFT]:
 			print 'smash strong'
-			result = strongSmash()
+			result = strongSmash(watchLimit, watchCount, Display)
 			if type(result) == tuple :
 				pass
 			elif type(result) == bool :
 				pass
-
 		elif Key[pygame.constants.K_ESCAPE]:
 			print 'quit'
 			time.sleep(1)
 			return
 
-	pygame.display.update()
+		pygame.display.update()
