@@ -3,7 +3,6 @@ from pygame.locals import *
 
 
 
-
 bg = pygame.image.load('gamebg.png')
 player = pygame.image.load('player.png')
 clerk = (pygame.image.load('clerk.png'), pygame.image.load('clerkwatching.png'))
@@ -19,6 +18,9 @@ watched = pygame.image.load('clerkwatched.png')
 
 cps = pygame.image.load('compensate.png')
 gameover = pygame.image.load('gameover.png')
+
+#crash = pygame.mixer.Sound('crash.wav')
+#ahhhh = pygame.mixer.Sound('ahhhh.wav')
 
 
 

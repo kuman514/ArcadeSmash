@@ -9,8 +9,10 @@ pygame.init()
 
 Display = pygame.display.set_mode((width,height))
 Title = pygame.image.load('maintitle.png')
-
 pygame.display.set_caption('Arcade Smash')
+
+pygame.mixer.music.load("maintheme.mp3")	# "Random Battle" by controllerhead
+pygame.mixer.music.play(-1,0)
 
 while True:
 	for Event in pygame.event.get():
@@ -26,7 +28,9 @@ while True:
 
 	if Key[pygame.constants.K_RETURN] :
 		print 'game start'
+		pygame.mixer.music.stop()
 		AS_Game.Play(Display)
+		pygame.mixer.music.play(-1,0)
 	elif Key[pygame.constants.K_ESCAPE] :
 		print 'exit to windows'
 		pygame.quit()
