@@ -3,12 +3,28 @@ from pygame.locals import *
 
 
 
-def normalSmash(watchLimit, watchCount, Display):
-	animation = (pygame.image.load('normalsmash1.png'), pygame.image.load('normalsmash2.png'))
-	watched = pygame.image.load('clerkwatched.png')
 
+bg = pygame.image.load('gamebg.png')
+player = pygame.image.load('player.png')
+clerk = (pygame.image.load('clerk.png'), pygame.image.load('clerkwatching.png'))
+
+angerGauge = pygame.image.load('gauge_anger.png')
+watchGauge = pygame.image.load('gauge_watch.png')
+gaugePoint = pygame.image.load('gauge_point.png')
+watchMeter = pygame.image.load('watch_meter.png')
+
+n_animation = (pygame.image.load('normalsmash1.png'), pygame.image.load('normalsmash2.png'))
+s_animation = (pygame.image.load('strongsmash1.png'), pygame.image.load('strongsmash2.png'))
+watched = pygame.image.load('clerkwatched.png')
+
+cps = pygame.image.load('compensate.png')
+gameover = pygame.image.load('gameover.png')
+
+
+
+def normalSmash(watchLimit, watchCount, Display):
 	for i in range(0,2,1) :
-		Display.blit(animation[i], (0,0))
+		Display.blit(n_animation[i], (0,0))
 		pygame.display.update()
 		time.sleep(0.18)
 
@@ -22,11 +38,8 @@ def normalSmash(watchLimit, watchCount, Display):
 
 
 def strongSmash(watchLimit, watchCount, Display):
-	animation = (pygame.image.load('strongsmash1.png'), pygame.image.load('strongsmash2.png'))
-	watched = pygame.image.load('clerkwatched.png')
-
 	for i in range(0,6,1) :
-		Display.blit(animation[i % 2], (0,0))
+		Display.blit(s_animation[i % 2], (0,0))
 		pygame.display.update()
 		time.sleep(0.1)
 
@@ -35,12 +48,11 @@ def strongSmash(watchLimit, watchCount, Display):
 		pygame.display.update()
 		return
 	else :
-		return (300, -10, 25, 200)		# (money, anger, watchCount, score)
+		return (300, -10, 24, 200)		# (money, anger, watchCount, score)
 
 
 
 def compensate(money, watchLimit, watchCount, Display):
-	cps = pygame.image.load('compensate.png')
 	price = (1000, 5000, 10000, 30000)
 	satisfy = (2, 12, 25, 80)
 	cursor = 0
@@ -54,6 +66,13 @@ def compensate(money, watchLimit, watchCount, Display):
 				sys.exit()
 
 		Display.blit(cps, (0,0))
+		pygame.draw.rect(Display, 0x0000ff, (50+(220*cursor),100,200,340), 4)
+
+		Display.blit(watchGauge, (535,470))
+		for i in range(0,watchCount,1) :
+			Display.blit(gaugePoint, (535 + (4 * i), 491))
+
+		Display.blit(watchMeter, (535 + (4 * watchLimit), 491))
 
 		Key = pygame.key.get_pressed()
 
@@ -61,6 +80,8 @@ def compensate(money, watchLimit, watchCount, Display):
 			if money >= price[cursor] :
 				money -= price[cursor]
 				watchCount -= satisfy[cursor]
+				if watchCount < 0 :
+					watchCount = 0
 			else :
 				print 'not enough money!'
 
@@ -82,14 +103,11 @@ def compensate(money, watchLimit, watchCount, Display):
 def Play(Display):
 	score = 0			# Total score
 	money = 0			# You can get some score on a smash
-	anger = 0			# If you don't smash your anger gets greater and greater (limit 100)
+	anger = 0			# If you don't smash, your anger gets greater and greater (limit 100)
 
-	watchLimit = 90
+	watchLimit = 80
 	watchCount = 0		# The clerk would watch
-
-	bg = pygame.image.load('gamebg.png')
-	player = pygame.image.load('player.png')
-	clerk = (pygame.image.load('clerk.png'), pygame.image.load('clerkwatching.png'))
+	status = 0
 
 	S = time.time()
 	while True:
@@ -101,6 +119,8 @@ def Play(Display):
 		if watchCount >= watchLimit :
 			status = 1
 		else :
+			if status == 1 :
+				watchLimit -= 1
 			status = 0
 
 		E = time.time()
@@ -109,12 +129,22 @@ def Play(Display):
 			score += 10
 			anger += 1
 			if watchCount > 0 :
-				watchCount -= 1
+				watchCount -= 2
 
 		Display.fill(0x000000)
 		Display.blit(bg, (0,0))
 		Display.blit(player, (0,0))
 		Display.blit(clerk[status], (510,0))
+
+		Display.blit(angerGauge, (535,460))
+		for i in range(0,anger,1) :
+			Display.blit(gaugePoint, (535 + (4 * i), 481))
+
+		Display.blit(watchGauge, (535,380))
+		for i in range(0,watchCount,1) :
+			Display.blit(gaugePoint, (535 + (4 * i), 401))
+
+		Display.blit(watchMeter, (535 + (4 * watchLimit), 401))
 
 		Key = pygame.key.get_pressed()
 
@@ -132,6 +162,8 @@ def Play(Display):
 				time.sleep(1)
 				if compensate(money, watchLimit, watchCount, Display) :
 					print 'game over'
+					Display.blit(gameover, (0,0))
+					pygame.display.update()
 					time.sleep(3)
 					return
 				else :
@@ -151,6 +183,8 @@ def Play(Display):
 				time.sleep(1)
 				if compensate(money, watchLimit, watchCount, Display) :
 					print 'game over'
+					Display.blit(gameover, (0,0))
+					pygame.display.update()
 					time.sleep(3)
 					return
 				else :
@@ -160,5 +194,8 @@ def Play(Display):
 			print 'quit'
 			time.sleep(1)
 			return
+
+		if(anger < 0) :
+			anger = 0
 
 		pygame.display.update()
