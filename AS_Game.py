@@ -48,14 +48,15 @@ def strongSmash(watchLimit, watchCount, Display):
 		pygame.display.update()
 		return
 	else :
-		return (300, -10, 24, 200)		# (money, anger, watchCount, score)
+		return (500, -10, 24, 200)		# (money, anger, watchCount, score)
 
 
 
 def compensate(money, watchLimit, watchCount, Display):
-	price = (1000, 5000, 10000, 30000)
-	satisfy = (2, 12, 25, 80)
+	price = (300, 1000, 2500, 5000)
+	satisfy = (3, 11, 28, 60)
 	cursor = 0
+	font = pygame.font.Font(None, 30)
 
 	# If you made the clerk mad, you should satisfy him by compensating.
 
@@ -74,6 +75,11 @@ def compensate(money, watchLimit, watchCount, Display):
 
 		Display.blit(watchMeter, (535 + (4 * watchLimit), 491))
 
+		text = font.render('Money : %5s' % str(money), True, (0,0,0))
+		textRect = text.get_rect()
+		textRect.topright = [420,500]
+		Display.blit(text, textRect)
+
 		Key = pygame.key.get_pressed()
 
 		if Key[pygame.constants.K_RETURN]:
@@ -84,17 +90,21 @@ def compensate(money, watchLimit, watchCount, Display):
 					watchCount = 0
 			else :
 				print 'not enough money!'
+			time.sleep(0.3)
 
 		elif Key[pygame.constants.K_LEFT]:
 			cursor -= 1
 			cursor %= 4
+			time.sleep(0.3)
 
 		elif Key[pygame.constants.K_RIGHT]:
 			cursor += 1
 			cursor %= 4
+			time.sleep(0.3)
 
 		elif Key[pygame.constants.K_ESCAPE]:
-			return (watchCount >= watchLimit)
+			return (money / 2, watchCount, watchCount >= watchLimit)
+			# (money / 2, watchCount, Not Compensated?)
 
 		pygame.display.update()
 
@@ -167,14 +177,17 @@ def Play(Display):
 			else :
 				print 'oh no!'
 				time.sleep(1)
-				if compensate(money, watchLimit, watchCount, Display) :
+				cresult = compensate(money, watchLimit, watchCount, Display)
+				if cresult[2] :
 					print 'game over'
 					Display.blit(gameover, (0,0))
 					pygame.display.update()
 					time.sleep(3)
 					return
 				else :
-					watchCount = 0
+					money = cresult[0]
+					watchCount = cresult[1]
+					watchLimit = 80
 					anger = 0
 
 		elif Key[pygame.constants.K_LSHIFT]:
@@ -189,14 +202,17 @@ def Play(Display):
 			else :
 				print 'oh no!'
 				time.sleep(1)
-				if compensate(money, watchLimit, watchCount, Display) :
+				cresult = compensate(money, watchLimit, watchCount, Display)
+				if cresult[2] :
 					print 'game over'
 					Display.blit(gameover, (0,0))
 					pygame.display.update()
 					time.sleep(3)
 					return
 				else :
-					watchCount = 0
+					money = cresult[0]
+					watchCount = cresult[1]
+					watchLimit = 80
 					anger = 0
 
 		elif Key[pygame.constants.K_q]:
