@@ -109,6 +109,8 @@ def Play(Display):
 	watchCount = 0		# The clerk would watch
 	status = 0
 
+	font = pygame.font.Font(None, 30)
+
 	S = time.time()
 	while True:
 		for Event in pygame.event.get():
@@ -127,7 +129,7 @@ def Play(Display):
 		if E - S >= 1 :
 			S = time.time()
 			score += 10
-			anger += 1
+			anger += 2
 			if watchCount > 0 :
 				watchCount -= 2
 
@@ -135,6 +137,11 @@ def Play(Display):
 		Display.blit(bg, (0,0))
 		Display.blit(player, (0,0))
 		Display.blit(clerk[status], (510,0))
+
+		text = font.render('Score : %5s' % str(score) + '    Money : %5s' % str(money), True, (0,0,0))
+		textRect = text.get_rect()
+		textRect.topright = [860,355]
+		Display.blit(text, textRect)
 
 		Display.blit(angerGauge, (535,460))
 		for i in range(0,anger,1) :
@@ -167,7 +174,8 @@ def Play(Display):
 					time.sleep(3)
 					return
 				else :
-					pass
+					watchCount = 0
+					anger = 0
 
 		elif Key[pygame.constants.K_LSHIFT]:
 			print 'smash strong'
@@ -188,14 +196,21 @@ def Play(Display):
 					time.sleep(3)
 					return
 				else :
-					pass
+					watchCount = 0
+					anger = 0
 
-		elif Key[pygame.constants.K_ESCAPE]:
+		elif Key[pygame.constants.K_q]:
 			print 'quit'
-			time.sleep(1)
 			return
 
 		if(anger < 0) :
 			anger = 0
+
+		if(anger > 100) :
+			print 'game over'
+			Display.blit(gameover, (0,0))
+			pygame.display.update()
+			time.sleep(3)
+			return
 
 		pygame.display.update()
